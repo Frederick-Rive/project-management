@@ -34,20 +34,24 @@ const Account = require('./models/account.js');
 //const Task = require('./models/task.js');
 //const Project = require('./models/project.js');
 
+var user = new Account();
+
 //gets an account based on its ID
 app.get('/account', async (req, res) => {
-  let accountResult = "FUCK";
   if (req.query.u && req.query.u != "{}") {
     if (req.query.u) {
       var account = await findAccount(req.query.u);
-      res.send(account);
+      if (account) {
+        user = account;
+        console.log(user);
+        res.send("1");
+      } else {
+        res.send("0");
+      }
     }
     else {
-      res.send("FAIL");
+      res.send("0");
     }
-  } else {
-    var account = await findAccount();
-    res.send(account);
   }
 });
 
@@ -57,10 +61,13 @@ app.post('/account', (req, res) => {
     _id: new mongoose.Types.ObjectId,
     username: req.body.n,
     password: req.h,
-    description: req.body.description,
-    is_admin: req.body.is_admin
 });
   console.log(newAccount);
+});
+
+//gets an account based on its ID
+app.get('/user', async (req, res) => {
+  res.send(user);
 });
 
 app.listen(6069, () => {
@@ -71,7 +78,7 @@ function findAccount(uName) {
   return Account.findOne({ username: uName })
   .exec()
   .then((accountResult) => {
-    console.log(accountResult);
+    console.log(uName + " " + accountResult);
     return accountResult;
   })
   .catch((err) => {
@@ -79,11 +86,12 @@ function findAccount(uName) {
   })
 }
 
-function findAccount() { 
+function findAccountNoUname() { 
+  console.log("aa");
   return Account.findOne()
   .exec()
   .then((accountResult) => {
-    console.log(accountResult)
+    console.log(uname + " " + accountResult)
     return accountResult;
   })
   .catch((err) => {

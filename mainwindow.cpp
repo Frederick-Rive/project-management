@@ -4,7 +4,6 @@
 #include "kanbanboard.h"
 #include "ganttchart.h"
 #include "adminscreen.h"
-#include <QLabel>
 #include <QMouseEvent>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -30,14 +29,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget *pfpWidget = new QWidget(this);
     ui->leftLayout->addWidget(pfpWidget);
 
-    QLabel *usernameLabel = new QLabel(this);
+    usernameLabel = new QLabel(this);
     usernameLabel->setText(QString::fromStdString(tempUA->getUsername()));
     ui->leftLayout->addWidget(usernameLabel);
 
     QLabel *projectTitle = new QLabel(this);
     projectTitle->setText("Project");
     ui->leftLayout->addWidget(projectTitle);
-    QLabel *projectName = new QLabel(this);
+    projectName = new QLabel(this);
     projectName->setText(QString::fromStdString(tempProject->getName()));
     ui->leftLayout->addWidget(projectName);
 
@@ -71,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     manager = new QNetworkAccessManager();
 
-    TestConnection();
+    GetUser();
 }
 
 MainWindow::~MainWindow()
@@ -79,18 +78,39 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::TestConnection() const {
+void MainWindow::GetUser() const {
     auto status = connect(manager, &QNetworkAccessManager::finished,
-                      this, &MainWindow::ReplyFinished);
+                      this, &MainWindow::UserReply);
     qDebug() << "Connection status:" << status;
 
-    manager->get(QNetworkRequest(QUrl("http://localhost:6069/account")));//?username=Test&password=test
+    manager->get(QNetworkRequest(QUrl("http://localhost:6069/user")));//?username=Test&password=test
 }
 
-void MainWindow::ReplyFinished(QNetworkReply *reply) {
+void MainWindow::UserReply(QNetworkReply *reply) {
     QString answer = reply->readAll();
     qDebug() << answer;
-    //QApplication::quit();
+    login(answer);
+}
+
+void MainWindow::login(QString please){
+    std::string username, password, email, id;
+    std::vector<std::string> projects;
+    QStringList record = please.split(",").replaceInStrings("{", "").replaceInStrings("}", "");
+    for (QString r : record) {
+        qDebug() << r;
+        QString field = r.split(":")[0].replace("\"", "");
+        QString value = r.split(":")[1].replace("\"", "");
+        qDebug() << field << "\n" << value;
+        if (field == "username") {
+            username = value.toStdString();
+        } else if (field == "password") {
+            password = value.toStdString();
+        } else if (field == "id") {
+            id = value.toStdString();
+        }
+    }
+    user = new project::Account(username, password, id);
+    usernameLabel->setText(QString::fromStdString(user->getUsername()));
 }
 
 void MainWindow::on_kanbanButton_clicked()

@@ -18,17 +18,13 @@ class login : public QMainWindow
 public:
     login(QWidget *parent = nullptr);
     ~login();
-    static void ReplyFinished(QNetworkReply *reply);
+    void ReplyFinished(QNetworkReply *reply);
+    void logIn();
 
 private slots:
-
     void on_loginButton_clicked();
-
-    void on_registerButton_clicked();
-
 private:
     Ui::login *ui;
-
 
     QNetworkAccessManager *manager;
     QNetworkRequest request;

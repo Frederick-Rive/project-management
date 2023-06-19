@@ -9,7 +9,7 @@ KanbanWidget::KanbanWidget(std::string name, QWidget *parent) :
 
     ui->title->setText(QString::fromStdString(name));
 
-    this->setStyleSheet("background-color: #A3CEF1; font-size: 12px; border-radius: 5px; color: #000");
+    ui->verticalWidget->setStyleSheet("background-color: #A3CEF1; font-size: 18px; border-radius: 5px; color: #000");
 }
 
 KanbanWidget::~KanbanWidget()

@@ -9,6 +9,8 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
+#include <QLabel>
+#include "projectobjects.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,8 +26,14 @@ public:
     ~MainWindow();
 
     void ClearMainWidget();
-    void TestConnection() const;
-    static void ReplyFinished(QNetworkReply *reply);
+    void GetUser() const;
+    void UserReply(QNetworkReply *reply);
+    void GetProject() const;
+    void ProjectReply(QNetworkReply *reply);
+    void GetTask() const;
+    void TaskReply(QNetworkReply *reply);
+
+    void login(QString please);
 
 private slots:
     void on_adminButton_clicked();
@@ -51,6 +59,10 @@ private:
 
     QNetworkAccessManager *manager;
     QNetworkRequest request;
+
+    QLabel *usernameLabel, *projectName;
+
+    project::Account *user;
 
 };
 

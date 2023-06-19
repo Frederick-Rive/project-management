@@ -2,14 +2,13 @@
 #include "ui_login.h"
 #include <QWidget>
 #include <QPushButton>
+#include <mainwindow.h>
 
 login::login(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::login)
 {
     ui->setupUi(this);
-
-    manager = new QNetworkAccessManager();
 }
 
 login::~login()
@@ -18,16 +17,24 @@ login::~login()
 }
 
 void login::ReplyFinished(QNetworkReply *reply) {
-    qDebug() << reply->read(9999);
+    auto read = reply->read(1);
+    std::string result = std::string(read.constData(), 1);
+    qDebug() << QString::fromStdString(result);
+    if (std::string(read.constData(), 1) == "1") {
+        qDebug() << "aaa";
+        logIn();
+    }
+    reply->abort();
+    reply->deleteLater();
+    reply->manager()->deleteLater();
 }
 
 void login::on_loginButton_clicked()
 {
+    manager = new QNetworkAccessManager();
     if(ui->usernameEdit->text() != "" && ui->passwordEdit->text() != "") {
         QString username = ui->usernameEdit->text();
         QString password = ui->passwordEdit->text();
-
-        qDebug() << "WE ARE SO DONE";
 
         auto status = connect(manager, &QNetworkAccessManager::finished,
                           this, &login::ReplyFinished);
@@ -38,31 +45,10 @@ void login::on_loginButton_clicked()
 }
 
 
-void login::on_registerButton_clicked()
-{
-    if(ui->usernameEdit->text() != "" && ui->passwordEdit->text() != "") {
-        QString username = ui->usernameEdit->text();
-        QString password = ui->passwordEdit->text();
 
-        qDebug() << "WE ARE SO DONE";
-
-        auto status = connect(manager, &QNetworkAccessManager::finished,
-                          this, &login::ReplyFinished);
-        qDebug() << "Connection status:" << status;
-
-        QHttpPart loginPart;
-        loginPart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("form-data; name=\"u\""));
-        loginPart.setBody(username.toUtf8());
-
-        QHttpPart hashPart;
-        hashPart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("form-data; name=\"h\""));
-        hashPart.setBody(password.toUtf8());
-
-        QHttpMultiPart *fullPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-
-        qDebug() << &fullPart;
-
-        manager->post(QNetworkRequest(QUrl("http://localhost:6069/account")), fullPart);
-    }
+void login::logIn() {
+    MainWindow *w = new MainWindow;
+    w->show();
+    this->close();
 }
 
