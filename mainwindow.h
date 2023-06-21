@@ -11,6 +11,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QLabel>
 #include "projectobjects.h"
+#include "taskmodal.h"
 
 namespace Ui {
 class MainWindow;
@@ -26,12 +27,15 @@ public:
     ~MainWindow();
 
     void ClearMainWidget();
+
     void GetUser() const;
     void UserReply(QNetworkReply *reply);
     void GetProject() const;
     void ProjectReply(QNetworkReply *reply);
     void GetTask() const;
     void TaskReply(QNetworkReply *reply);
+
+    void OpenTaskModal(project::Task *task);
 
     void login(QString please);
 
@@ -41,8 +45,6 @@ private slots:
     void on_ganttButton_clicked();
 
     void on_kanbanButton_clicked();
-
-    bool eventFilter (QObject *obj, QEvent *event);
 
     void on_closeButton_clicked();
 
@@ -64,6 +66,9 @@ private:
 
     project::Account *user;
 
+    TaskModal *modal = nullptr;
+
+    bool eventFilter (QObject *obj, QEvent *event);
 };
 
 #endif // MAINWINDOW_H

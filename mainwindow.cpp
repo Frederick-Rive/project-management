@@ -5,6 +5,7 @@
 #include "ganttchart.h"
 #include "adminscreen.h"
 #include <QMouseEvent>
+#include <QSize>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -71,6 +72,9 @@ MainWindow::MainWindow(QWidget *parent) :
     manager = new QNetworkAccessManager();
 
     GetUser();
+
+    ui->headerWidget->installEventFilter(this);
+    ui->leftWidget->installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
@@ -123,7 +127,7 @@ void MainWindow::on_kanbanButton_clicked()
 
     activeButton = ui->kanbanButton;
     activeButton->setStyleSheet("background-color: #274C77;");
-    mainWidget = new KanbanBoard();
+    mainWidget = new KanbanBoard(this, this);
 
     ui->mainLayout->addWidget(mainWidget);
 }
@@ -173,11 +177,21 @@ void MainWindow::ClearMainWidget() {
     delete mainWidget;
 }
 
+void MainWindow::OpenTaskModal(project::Task *task) {
+    modal = new TaskModal(task, this);
+    modal->move(ui->mainLayout->geometry().center() - modal->geometry().center());
+    modal->show();
+}
+
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    if (obj == (QObject*)ui->headerWidget)
+    if (event->type() == QEvent::MouseButtonPress)
     {
-        if (event->type() == QEvent::MouseButtonPress)
+        if (modal != nullptr) {
+            delete modal;
+            modal = nullptr;
+        }
+        if (obj == (QObject*)ui->headerWidget || obj == (QObject*)ui->leftWidget)
         {
             QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(event);
             if (mouseEvent->button() == Qt::LeftButton)
@@ -186,14 +200,13 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 return false;
             }
         }
-        else if (event->type() == QEvent::MouseMove)
+    } else if (event->type() == QEvent::MouseMove)
+    {
+        QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(event);
+        if (mouseEvent->buttons() & Qt::LeftButton)
         {
-            QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(event);
-            if (mouseEvent->buttons() & Qt::LeftButton)
-            {
-                move(mouseEvent->globalPosition().toPoint() - startPos);
-                return false;
-            }
+            move(mouseEvent->globalPosition().toPoint() - startPos);
+            return false;
         }
     }
     return false;

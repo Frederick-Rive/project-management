@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <kanbanwidget.h>
 #include <projectobjects.h>
+#include "mainwindow.h"
 
 namespace Ui {
 class KanbanBoard;
@@ -14,7 +15,7 @@ class KanbanBoard : public QWidget
     Q_OBJECT
 
 public:
-    explicit KanbanBoard(QWidget *parent = nullptr);
+    explicit KanbanBoard(MainWindow *m, QWidget *parent = nullptr);
     ~KanbanBoard();
     void AddTask(int state, project::Task* task);
     void RemoveTask(int state, int index);
@@ -22,6 +23,7 @@ public:
 
 private:
     Ui::KanbanBoard *ui;
+    MainWindow *mainWindow;
     std::vector<project::Task*> todoList, progressList, completedList;
 };
 

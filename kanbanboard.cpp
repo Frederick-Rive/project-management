@@ -1,11 +1,13 @@
 #include "kanbanboard.h"
 #include "ui_kanbanboard.h"
 
-KanbanBoard::KanbanBoard(QWidget *parent) :
+KanbanBoard::KanbanBoard(MainWindow *m, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::KanbanBoard)
 {
     ui->setupUi(this);
+
+    mainWindow = m;
 
     this->setStyleSheet("QWidget { background-color: #fff; } QLabel { background-color: #6096BA; color:#fff; }");
 
@@ -26,7 +28,7 @@ KanbanBoard::~KanbanBoard()
 }
 
 void KanbanBoard::AddTask(int state, project::Task* task) {
-    KanbanWidget *newWidget = new KanbanWidget(task->getName(), this);
+    KanbanWidget *newWidget = new KanbanWidget(task, mainWindow, this);
     switch(state){
     case 0:
         ui->todoLayout->insertWidget(this->todoList.size(), newWidget);
