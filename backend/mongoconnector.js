@@ -31,27 +31,43 @@ mongoose.connect('mongodb+srv://Freddie-RIve:LGmw1XzE4hhnzgg7@project-management
 const Account = require('./models/account.js');
 //const UserAccess = require('./models/useraccess.js');
 //const Log = require('./models/log.js');
-//const Task = require('./models/task.js');
-//const Project = require('./models/project.js');
+const Task = require('./models/task.js');   
+const Project = require('./models/project.js');
 
 var user = new Account();
 
 //gets an account based on its ID
 app.get('/account', async (req, res) => {
   if (req.query.u && req.query.u != "{}") {
-    if (req.query.u) {
-      var account = await findAccount(req.query.u);
-      if (account) {
-        user = account;
-        console.log(user);
-        res.send("1");
-      } else {
-        res.send("0");
-      }
-    }
-    else {
+    var account = await findAccount(req.query.u);
+    if (account) {
+      user = account;
+      console.log(user);
+      res.send("1");
+    } else {
       res.send("0");
     }
+  }
+  else {
+    res.send("0");
+  }
+});
+
+app.get('/task', async (req, res) => {
+  if (req.query.id && req.query.id != "{}") {
+    console.log(req.query.id);
+    console.log("AAAAAAAAAAAAA");
+    var task = await findTask(req.query.id);
+    if (task) {
+      res.send(task);
+    } else {
+      res.send("0");
+    }
+  }
+  else {
+    var task = await findTask();
+    console.log(task);
+    res.send("0");
   }
 });
 
@@ -87,12 +103,23 @@ function findAccount(uName) {
 }
 
 function findAccountNoUname() { 
-  console.log("aa");
   return Account.findOne()
   .exec()
   .then((accountResult) => {
     console.log(uname + " " + accountResult)
     return accountResult;
+  })
+  .catch((err) => {
+    return ("Error: " + err);
+  })
+}
+
+function findTask(id) { 
+  return Task.find()
+  .exec()
+  .then((taskResult) => {
+    console.log(taskResult);
+    return taskResult;
   })
   .catch((err) => {
     return ("Error: " + err);

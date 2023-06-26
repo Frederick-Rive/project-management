@@ -69,6 +69,7 @@ private:
     TaskModal *modal = nullptr;
 
     bool eventFilter (QObject *obj, QEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // MAINWINDOW_H

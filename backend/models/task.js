@@ -5,8 +5,8 @@ const taskSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     name : String,
     description : String,
-    startDate : Number[3],
-    endDate : Number[3],
+    startDate : [Number],
+    endDate : [Number],
     state : String,
     users : [mongoose.Schema.Types.ObjectId]
 }, {

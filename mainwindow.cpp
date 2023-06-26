@@ -87,7 +87,7 @@ void MainWindow::GetUser() const {
                       this, &MainWindow::UserReply);
     qDebug() << "Connection status:" << status;
 
-    manager->get(QNetworkRequest(QUrl("http://localhost:6069/user")));//?username=Test&password=test
+    manager->get(QNetworkRequest(QUrl("http://localhost:6069/user")));
 }
 
 void MainWindow::UserReply(QNetworkReply *reply) {
@@ -115,6 +115,20 @@ void MainWindow::login(QString please){
     }
     user = new project::Account(username, password, id);
     usernameLabel->setText(QString::fromStdString(user->getUsername()));
+    qDebug() << "getting task";
+    GetTask();
+}
+
+void MainWindow::GetTask() const {
+    auto status = connect(manager, &QNetworkAccessManager::finished,
+                      this, &MainWindow::TaskReply);
+    qDebug() << "Connection status:" << status;
+
+    manager->get(QNetworkRequest(QUrl("http://localhost:6069/task?id=6496eaea0cb82235725b3c38")));
+}
+void MainWindow::TaskReply(QNetworkReply *reply) {
+    QString answer = reply->readAll();
+    qDebug() << answer;
 }
 
 void MainWindow::on_kanbanButton_clicked()
@@ -187,10 +201,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress)
     {
-        if (modal != nullptr) {
-            delete modal;
-            modal = nullptr;
-        }
         if (obj == (QObject*)ui->headerWidget || obj == (QObject*)ui->leftWidget)
         {
             QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(event);
@@ -211,3 +221,16 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     }
     return false;
 }
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        if (modal != nullptr) {
+            delete modal;
+            modal = nullptr;
+        }
+    }
+    return;
+}
+

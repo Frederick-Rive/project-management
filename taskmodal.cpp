@@ -7,12 +7,14 @@ TaskModal::TaskModal(project::Task *t, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    task = t;
+    if (t != nullptr) {
+        task = t;
 
-    this->setTitle(task->getName());
-    this->setDescription(task->getDescription());
-    this->setStartDate(task->getStartDate());
-    this->setEndDate(task->getEndDate());
+        this->setTitle(task->getName());
+        this->setDescription(task->getDescription());
+        this->setStartDate(task->getStartDate());
+        this->setEndDate(task->getEndDate());
+    }
 }
 
 void TaskModal::setTitle(std::string input) {
