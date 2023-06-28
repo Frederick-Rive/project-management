@@ -42,7 +42,6 @@ app.get('/account', async (req, res) => {
     var account = await findAccount(req.query.u);
     if (account) {
       user = account;
-      console.log(user);
       res.send("1");
     } else {
       res.send("0");
@@ -55,11 +54,9 @@ app.get('/account', async (req, res) => {
 
 app.get('/task', async (req, res) => {
   if (req.query.id && req.query.id != "{}") {
-    console.log(req.query.id);
-    console.log("AAAAAAAAAAAAA");
     var task = await findTask(req.query.id);
     if (task) {
-      res.send(task);
+        res.send(task);
     } else {
       res.send("0");
     }
@@ -72,7 +69,6 @@ app.get('/task', async (req, res) => {
 });
 
 app.post('/account', (req, res) => {
-  console.log(req);
   var newAccount = new Account({
     _id: new mongoose.Types.ObjectId,
     username: req.body.n,
@@ -81,9 +77,25 @@ app.post('/account', (req, res) => {
   console.log(newAccount);
 });
 
+app.get('/project', async (req, res) => {
+  if (req.query.id && req.query.id != "{}") {
+    var project = await findProject(req.query.id);
+    if (project) {
+      res.send(project);
+    } else {
+      res.send("0");
+    }
+  }
+  else {
+    var task = await findTask();
+    console.log(task);
+    res.send("0");
+  }
+});
+
 //gets an account based on its ID
 app.get('/user', async (req, res) => {
-  res.send(user);
+  res.send(jsonToString(user));
 });
 
 app.listen(6069, () => {
@@ -94,8 +106,7 @@ function findAccount(uName) {
   return Account.findOne({ username: uName })
   .exec()
   .then((accountResult) => {
-    console.log(uName + " " + accountResult);
-    return accountResult;
+    return (accountResult);
   })
   .catch((err) => {
     return ("Error: " + err);
@@ -106,8 +117,7 @@ function findAccountNoUname() {
   return Account.findOne()
   .exec()
   .then((accountResult) => {
-    console.log(uname + " " + accountResult)
-    return accountResult;
+    return jsonToString(accountResult);
   })
   .catch((err) => {
     return ("Error: " + err);
@@ -115,13 +125,21 @@ function findAccountNoUname() {
 }
 
 function findTask(id) { 
-  return Task.find()
+  return Task.findById(id)
   .exec()
   .then((taskResult) => {
-    console.log(taskResult);
-    return taskResult;
+    return jsonToString(taskResult);
   })
   .catch((err) => {
     return ("Error: " + err);
   })
+}
+
+function jsonToString(input) {
+  var rtrn = "";
+  for (key of Object.keys(Object.values(input)[2])) {
+    rtrn += (key + ": " + String(input[key]) + "|");
+  }
+  rtrn = rtrn.slice(0, -1);
+  return rtrn;
 }

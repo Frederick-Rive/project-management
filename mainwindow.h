@@ -28,16 +28,15 @@ public:
 
     void ClearMainWidget();
 
-    void GetUser() const;
+    void GetUser();
     void UserReply(QNetworkReply *reply);
-    void GetProject() const;
+    void GetProject();
     void ProjectReply(QNetworkReply *reply);
-    void GetTask() const;
+    void GetTask(QString id = "");
     void TaskReply(QNetworkReply *reply);
 
     void OpenTaskModal(project::Task *task);
-
-    void login(QString please);
+    void Logout();
 
 private slots:
     void on_adminButton_clicked();

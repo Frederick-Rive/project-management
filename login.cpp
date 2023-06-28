@@ -19,9 +19,7 @@ login::~login()
 void login::ReplyFinished(QNetworkReply *reply) {
     auto read = reply->read(1);
     std::string result = std::string(read.constData(), 1);
-    qDebug() << QString::fromStdString(result);
     if (std::string(read.constData(), 1) == "1") {
-        qDebug() << "aaa";
         logIn();
     }
     reply->abort();

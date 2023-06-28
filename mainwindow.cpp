@@ -6,6 +6,7 @@
 #include "adminscreen.h"
 #include <QMouseEvent>
 #include <QSize>
+#include "login.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -51,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *logOut = new QPushButton(this);
     logOut->setText("Log Out");
     ui->leftLayout->addWidget(logOut);
+    connect(logOut, SIGNAL(QPushButton::clicked), this, SLOT(MainWindow::Logout));
 
     //mainwindow
 
@@ -69,8 +71,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //node::Start
 
-    manager = new QNetworkAccessManager();
-
     GetUser();
 
     ui->headerWidget->installEventFilter(this);
@@ -82,29 +82,25 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::GetUser() const {
+void MainWindow::GetUser() {
+    manager = new QNetworkAccessManager;
     auto status = connect(manager, &QNetworkAccessManager::finished,
                       this, &MainWindow::UserReply);
-    qDebug() << "Connection status:" << status;
 
     manager->get(QNetworkRequest(QUrl("http://localhost:6069/user")));
 }
 
 void MainWindow::UserReply(QNetworkReply *reply) {
     QString answer = reply->readAll();
-    qDebug() << answer;
-    login(answer);
-}
 
-void MainWindow::login(QString please){
     std::string username, password, email, id;
     std::vector<std::string> projects;
-    QStringList record = please.split(",").replaceInStrings("{", "").replaceInStrings("}", "");
+    QStringList record = answer.split("|");
     for (QString r : record) {
         qDebug() << r;
         QString field = r.split(":")[0].replace("\"", "");
         QString value = r.split(":")[1].replace("\"", "");
-        qDebug() << field << "\n" << value;
+        qDebug() << field << ": " << value;
         if (field == "username") {
             username = value.toStdString();
         } else if (field == "password") {
@@ -115,20 +111,24 @@ void MainWindow::login(QString please){
     }
     user = new project::Account(username, password, id);
     usernameLabel->setText(QString::fromStdString(user->getUsername()));
-    qDebug() << "getting task";
-    GetTask();
+
+    GetTask("6496eaea0cb82235725b3c38");
 }
 
-void MainWindow::GetTask() const {
+void MainWindow::GetTask(QString id) {
+    manager = new QNetworkAccessManager;
     auto status = connect(manager, &QNetworkAccessManager::finished,
                       this, &MainWindow::TaskReply);
-    qDebug() << "Connection status:" << status;
 
-    manager->get(QNetworkRequest(QUrl("http://localhost:6069/task?id=6496eaea0cb82235725b3c38")));
+    manager->get(QNetworkRequest(QUrl("http://localhost:6069/task?id="+id)));
 }
 void MainWindow::TaskReply(QNetworkReply *reply) {
     QString answer = reply->readAll();
     qDebug() << answer;
+
+    std::string username, password, email, id;
+    std::vector<std::string> projects;
+    QStringList record = answer.split("|");
 }
 
 void MainWindow::on_kanbanButton_clicked()
@@ -195,6 +195,12 @@ void MainWindow::OpenTaskModal(project::Task *task) {
     modal = new TaskModal(task, this);
     modal->move(ui->mainLayout->geometry().center() - modal->geometry().center());
     modal->show();
+}
+
+void MainWindow::Logout() {
+    login *l = new login();
+    l->show();
+    this->close();
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
