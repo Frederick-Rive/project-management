@@ -105,7 +105,7 @@ void MainWindow::UserReply(QNetworkReply *reply) {
             username = value.toStdString();
         } else if (field == "password") {
             password = value.toStdString();
-        } else if (field == "id") {
+        } else if (field == "_id") {
             id = value.toStdString();
         }
     }
@@ -126,9 +126,31 @@ void MainWindow::TaskReply(QNetworkReply *reply) {
     QString answer = reply->readAll();
     qDebug() << answer;
 
-    std::string username, password, email, id;
-    std::vector<std::string> projects;
+    std::string id, name, description;
+    project::Date *start, *end;
     QStringList record = answer.split("|");
+
+    for (QString r : record) {
+        qDebug() << r;
+        QString field = r.split(":")[0].replace("\"", "");
+        QString value = r.split(":")[1].replace("\"", "");
+        qDebug() << field << ": " << value;
+        if (field == "_id") {
+            id = value.toStdString();
+        } else if (field == "name") {
+            name = value.toStdString();
+        } else if (field == "description") {
+            description = value.toStdString();
+        } else if (field == "startDate") {
+            QStringList nums = value.split(',');
+            start = new project::Date(nums[0].toInt(),nums[1].toInt(),nums[2].toInt());
+        } else if (field == "endDate") {
+            QStringList nums = value.split(',');
+            end = new project::Date(nums[0].toInt(),nums[1].toInt(),nums[2].toInt());
+        }
+    }
+
+    project::Task *t = new project::Task(id, name, description, start, end);
 }
 
 void MainWindow::on_kanbanButton_clicked()

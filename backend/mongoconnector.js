@@ -138,7 +138,7 @@ function findTask(id) {
 function jsonToString(input) {
   var rtrn = "";
   for (key of Object.keys(Object.values(input)[2])) {
-    rtrn += (key + ": " + String(input[key]) + "|");
+    rtrn += (key + ":" + String(input[key]) + "|");
   }
   rtrn = rtrn.slice(0, -1);
   return rtrn;

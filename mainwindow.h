@@ -67,6 +67,8 @@ private:
 
     TaskModal *modal = nullptr;
 
+    std::vector<project::Task*> todo, inprogress, completed;
+
     bool eventFilter (QObject *obj, QEvent *event);
     void mousePressEvent(QMouseEvent *event);
 };

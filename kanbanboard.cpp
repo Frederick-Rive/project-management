@@ -13,13 +13,9 @@ KanbanBoard::KanbanBoard(MainWindow *m, QWidget *parent) :
 
     std::string name = "Finish the FUCKING aesthetics", desc = "pleaaase";
 
-    project::Task *testTask = new project::Task(name, desc, new project::Date(20, 5, 2023), new project::Date(22, 5, 2023));
-
     ui->todoLayout->addStretch();
     ui->inprogressLayout->addStretch();
     ui->completedLayout->addStretch();
-
-    this->AddTask(0, testTask);
 }
 
 KanbanBoard::~KanbanBoard()

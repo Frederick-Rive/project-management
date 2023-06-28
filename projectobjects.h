@@ -86,7 +86,7 @@ namespace project {
         std::vector<std::string> users;
 
     public:
-        Task(std::string n, std::string d, Date* start, Date* end);
+        Task(std::string i, std::string n, std::string d, Date* start, Date* end);
         std::string getName();
         bool setName(std::string input);
         std::string getDescription();

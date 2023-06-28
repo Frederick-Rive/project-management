@@ -79,7 +79,8 @@ std::string Log::getActivity() { return this->activity; }
 Date Log::getDate() { return this->date; }
 
 
-Task::Task(std::string n, std::string d, Date *start, Date *end) {
+Task::Task(std::string i, std::string n, std::string d, Date *start, Date *end) {
+    this->id = i;
     this->name = n;
     this->description = d;
     this->startDate = *start;
