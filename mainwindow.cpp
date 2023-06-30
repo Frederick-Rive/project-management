@@ -1,12 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "notification.h"
-#include "kanbanboard.h"
-#include "ganttchart.h"
-#include "adminscreen.h"
 #include <QMouseEvent>
 #include <QSize>
 #include "login.h"
+#include "kanbanboard.h"
+#include "ganttchart.h"
+#include "adminscreen.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //mainwindow
 
-    mainWidget = new KanbanBoard(this);
+    mainWidget = new KanbanBoard(this);;
     ui->mainLayout->addWidget(mainWidget);
     activeButton = ui->kanbanButton;
     activeButton->setStyleSheet("background-color: #274C77;");
@@ -126,7 +126,7 @@ void MainWindow::TaskReply(QNetworkReply *reply) {
     QString answer = reply->readAll();
     qDebug() << answer;
 
-    std::string id, name, description;
+    std::string id, name, description, state;
     project::Date *start, *end;
     QStringList record = answer.split("|");
 
@@ -147,10 +147,20 @@ void MainWindow::TaskReply(QNetworkReply *reply) {
         } else if (field == "endDate") {
             QStringList nums = value.split(',');
             end = new project::Date(nums[0].toInt(),nums[1].toInt(),nums[2].toInt());
+        } else if (field == "state") {
+            state = value.toStdString();
         }
     }
 
     project::Task *t = new project::Task(id, name, description, start, end);
+    t->setState(state);
+    if (state == "To do") {
+        todo.push_back(t);
+    } else if (state == "In progress") {
+        inprogress.push_back(t);
+    } else if (state == "Completed") {
+        completed.push_back(t);
+    }
 }
 
 void MainWindow::on_kanbanButton_clicked()

@@ -11,8 +11,6 @@ KanbanBoard::KanbanBoard(MainWindow *m, QWidget *parent) :
 
     this->setStyleSheet("QWidget { background-color: #fff; } QLabel { background-color: #6096BA; color:#fff; }");
 
-    std::string name = "Finish the FUCKING aesthetics", desc = "pleaaase";
-
     ui->todoLayout->addStretch();
     ui->inprogressLayout->addStretch();
     ui->completedLayout->addStretch();

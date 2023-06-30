@@ -125,10 +125,15 @@ function findAccountNoUname() {
 }
 
 function findTask(id) { 
-  return Task.findById(id)
+  console.log(user._id);
+  return Task.findOne({_id: id, users: user._id})
   .exec()
   .then((taskResult) => {
-    return jsonToString(taskResult);
+    if (taskResult != null) {
+      return jsonToString(taskResult);
+    } else {
+      return taskResult;
+    }
   })
   .catch((err) => {
     return ("Error: " + err);
