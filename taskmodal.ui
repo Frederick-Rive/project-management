@@ -60,71 +60,19 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="title">
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>80</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
+       <widget class="QLineEdit" name="title"/>
       </item>
       <item>
-       <widget class="QLabel" name="startDate">
-        <property name="maximumSize">
-         <size>
-          <width>80</width>
-          <height>80</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
+       <widget class="QDateEdit" name="startDate"/>
       </item>
       <item>
-       <widget class="QLabel" name="endDate">
-        <property name="maximumSize">
-         <size>
-          <width>80</width>
-          <height>80</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
+       <widget class="QDateEdit" name="endDate"/>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="description">
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-    </widget>
+    <widget class="QTextEdit" name="description"/>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -132,6 +80,30 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveButton">
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QGridLayout" name="usersGrid" rowminimumheight="0"/>

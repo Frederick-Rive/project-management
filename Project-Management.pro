@@ -14,6 +14,7 @@ CONFIG += c++11
 
 SOURCES += \
     adminscreen.cpp \
+    encryption.cpp \
     ganttchart.cpp \
     kanbanboard.cpp \
     kanbanwidget.cpp \
@@ -26,6 +27,7 @@ SOURCES += \
 
 HEADERS += \
     adminscreen.h \
+    encryption.h \
     ganttchart.h \
     kanbanboard.h \
     kanbanwidget.h \
@@ -49,3 +51,12 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+INCLUDEPATH += $$PWD/.
+DEPENDPATH += $$PWD/.
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/3rdparty/cryptopp-master/x64/Output/release/ -lcryptlib
+
+INCLUDEPATH += $$PWD/3rdparty/cryptopp-master/x64/Output/Release
+DEPENDPATH += $$PWD/3rdparty/cryptopp-master/x64/Output/Release
+INCLUDEPATH += $$PWD/3rdparty/cryptopp-master

@@ -24,10 +24,12 @@ void TaskModal::setDescription(std::string input) {
     ui->description->setText(QString::fromStdString(input));
 }
 void TaskModal::setStartDate(project::Date input) {
-    ui->startDate->setText(QString::fromStdString(input.getDateString()));
+    QDate d = QDate(input.getDate(), input.getMonth(), input.getYear());
+    ui->startDate->setDate(d);
 }
 void TaskModal::setEndDate(project::Date input) {
-    ui->endDate->setText(QString::fromStdString(input.getDateString()));
+    QDate d = QDate(input.getDate(), input.getMonth(), input.getYear());
+    ui->startDate->setDate(d);
 }
 void TaskModal::addUser(project::UserAccess* input) {
     return;

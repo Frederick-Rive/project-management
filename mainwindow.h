@@ -38,6 +38,8 @@ public:
     void OpenTaskModal(project::Task *task);
     void Logout();
 
+    project::Task* GetLatestTask(int state);
+
 private slots:
     void on_adminButton_clicked();
 
@@ -50,6 +52,10 @@ private slots:
     void on_minimiseButton_clicked();
 
     //void ReplyFin(QNetworkReply *reply);
+
+signals:
+    void taskAdded(int state);
+    void tasksUpdated();
 
 private:
     Ui::MainWindow *ui;

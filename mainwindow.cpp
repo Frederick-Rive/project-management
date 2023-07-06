@@ -17,8 +17,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //project temp
 
     project::Project *tempProject = new project::Project("Create Application", new project::Date(30, 4, 2023), new project::Date(30, 5, 2023));
-    project::Account *tempAccount = new project::Account("Freddie", "psword", "freddierive@gmail.com");
-    project::UserAccess *tempUA = new project::UserAccess(tempAccount, "Admin");
 
     this->setStyleSheet(
                 "* { background-color: #fff }"
@@ -32,7 +30,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->leftLayout->addWidget(pfpWidget);
 
     usernameLabel = new QLabel(this);
-    usernameLabel->setText(QString::fromStdString(tempUA->getUsername()));
     ui->leftLayout->addWidget(usernameLabel);
 
     QLabel *projectTitle = new QLabel(this);
@@ -75,6 +72,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->headerWidget->installEventFilter(this);
     ui->leftWidget->installEventFilter(this);
+
+    project::Task* uploadTest = new project::Task("688434", "Upload", "I want To Upload", new project::Date(1, 7, 2023), new project::Date(3, 7, 2023));
+    manager = new QNetworkAccessManager;
+    auto status = connect(manager, &QNetworkAccessManager::finished,
+                      this, &MainWindow::UserReply);
+
+    //manager->post(QNetworkRequest(QUrl("http://localhost:6069/user")));
 }
 
 MainWindow::~MainWindow()
@@ -154,17 +158,32 @@ void MainWindow::TaskReply(QNetworkReply *reply) {
 
     project::Task *t = new project::Task(id, name, description, start, end);
     t->setState(state);
-    if (state == "To do") {
+    if (state == "To Do") {
         todo.push_back(t);
-    } else if (state == "In progress") {
+        emit(taskAdded(0));
+    } else if (state == "In Progress") {
         inprogress.push_back(t);
+        emit(taskAdded(1));
     } else if (state == "Completed") {
         completed.push_back(t);
+        emit(taskAdded(2));
     }
 }
 
-void MainWindow::on_kanbanButton_clicked()
-{
+project::Task* MainWindow::GetLatestTask(int state) {
+    switch(state){
+    case (0):
+        return todo[todo.size() - 1];
+    case (1):
+        return inprogress[inprogress.size() - 1];
+    case (2):
+        return completed[completed.size() - 1];
+    default:
+        return nullptr;
+    }
+}
+
+void MainWindow::on_kanbanButton_clicked() {
     if (activeButton != ui->kanbanButton) {
         activeButton->setStyleSheet("background-color: #6096BA;");
     }
@@ -178,8 +197,7 @@ void MainWindow::on_kanbanButton_clicked()
     ui->mainLayout->addWidget(mainWidget);
 }
 
-void MainWindow::on_ganttButton_clicked()
-{
+void MainWindow::on_ganttButton_clicked() {
     if (activeButton != ui->ganttButton) {
         activeButton->setStyleSheet("background-color: #6096BA;");
     }
@@ -193,8 +211,7 @@ void MainWindow::on_ganttButton_clicked()
     ui->mainLayout->addWidget(mainWidget);
 }
 
-void MainWindow::on_adminButton_clicked()
-{
+void MainWindow::on_adminButton_clicked() {
     if (activeButton != ui->adminButton) {
         activeButton->setStyleSheet("background-color: #6096BA;");
     }
@@ -209,13 +226,11 @@ void MainWindow::on_adminButton_clicked()
     ui->mainLayout->addWidget(mainWidget);
 }
 
-void MainWindow::on_closeButton_clicked()
-{
+void MainWindow::on_closeButton_clicked() {
     this->close();
 }
 
-void MainWindow::on_minimiseButton_clicked()
-{
+void MainWindow::on_minimiseButton_clicked() {
     this->setWindowState(Qt::WindowMinimized);
 }
 
@@ -225,7 +240,7 @@ void MainWindow::ClearMainWidget() {
 
 void MainWindow::OpenTaskModal(project::Task *task) {
     modal = new TaskModal(task, this);
-    modal->move(ui->mainLayout->geometry().center() - modal->geometry().center());
+    modal->move(this->geometry().center() - modal->geometry().center());
     modal->show();
 }
 

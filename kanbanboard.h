@@ -24,7 +24,15 @@ public:
 private:
     Ui::KanbanBoard *ui;
     MainWindow *mainWindow;
-    std::vector<project::Task*> todoList, progressList, completedList;
+    QPoint startPos;
+
+    KanbanWidget *active;
+
+    //void mouseReleaseEvent(QMouseEvent *event);
+    bool eventFilter (QObject *obj, QEvent *event);
+
+private slots:
+    void GetNewTask(int state);
 };
 
 #endif // KANBANBOARD_H

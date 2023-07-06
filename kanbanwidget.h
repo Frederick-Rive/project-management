@@ -22,8 +22,6 @@ private:
     project::Task *task;
     MainWindow *mainWindow;
     Ui::KanbanWidget *ui;
-
-    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // KANBANWIDGET_H

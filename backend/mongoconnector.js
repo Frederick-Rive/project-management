@@ -41,6 +41,7 @@ app.get('/account', async (req, res) => {
   if (req.query.u && req.query.u != "{}") {
     var account = await findAccount(req.query.u);
     if (account) {
+      console.log('logged in');
       user = account;
       res.send("1");
     } else {
@@ -125,19 +126,32 @@ function findAccountNoUname() {
 }
 
 function findTask(id) { 
-  console.log(user._id);
-  return Task.findOne({_id: id, users: user._id})
+  //queries databse for task
+  console.log("Querying for task '" + id + "'");
+  return Task.findOne(qObj(id))
   .exec()
   .then((taskResult) => {
+    //if a task is returned, send  task to application
     if (taskResult != null) {
+      console.log("Task found: " + taskResult);
       return jsonToString(taskResult);
     } else {
-      return taskResult;
+      //otherwise, send a 0 to show that nothing was returned
+      console.log("No task found");
+      return "0";
     }
   })
   .catch((err) => {
+    //if connection failed, return error message
     return ("Error: " + err);
   })
+}
+
+function qObj (id) {
+  let rtrn = {};
+  rtrn["_id"] = id;
+  rtrn["users"] = user._id;
+  return rtrn;
 }
 
 function jsonToString(input) {
