@@ -3,8 +3,9 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 const bodyParser = require('body-parser');
-app.use(bodyParser.json({ limit: '5mb' }));
-app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
+app.use(bodyParser.json({ limit: '20mb' }));
+app.use(bodyParser.text({ limit: '20mb' }));
+app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 const cors = require('cors');
 app.use(cors());
 const multer = require('multer');
@@ -39,7 +40,7 @@ var user = new Account();
 //gets an account based on its ID
 app.get('/account', async (req, res) => {
   if (req.query.u && req.query.u != "{}") {
-    var account = await findAccount(req.query.u);
+    var account = await findAccount(req.query.u, req.query.h);
     if (account) {
       console.log('logged in');
       user = account;
@@ -69,13 +70,29 @@ app.get('/task', async (req, res) => {
   }
 });
 
-app.post('/account', (req, res) => {
-  var newAccount = new Account({
-    _id: new mongoose.Types.ObjectId,
-    username: req.body.n,
-    password: req.h,
-});
-  console.log(newAccount);
+app.post('/account', async (req, res) => {
+  let body = JSON.parse(req.body);
+  Account.findOne({ username: body.n })
+  .exec()
+  .then((accountResult) => {
+    if (accountResult) {
+      console.log("Name Taken");
+      res.send("Name Taken");
+    } else {
+      var newAccount = new Account({
+        _id: new mongoose.Types.ObjectId,
+        username: body.n,
+        password: body.h,
+        email: null,
+        projects: [mongoose.Types.ObjectId("6490b3a858f110c790acb03e")]
+      });
+      newAccount.save();
+    }
+  })  
+  .catch((err) => {
+    //if connection failed, return error message
+    return ("Error: " + err);
+  })
 });
 
 app.get('/project', async (req, res) => {
@@ -103,11 +120,15 @@ app.listen(6069, () => {
   console.log("listening on port 6069");
 });
 
-function findAccount(uName) { 
+function findAccount(uName, pHash) { 
   return Account.findOne({ username: uName })
   .exec()
   .then((accountResult) => {
-    return (accountResult);
+    console.log(pHash)
+    if(accountResult.password == pHash){
+      return (accountResult);
+    } 
+    return 0;
   })
   .catch((err) => {
     return ("Error: " + err);
@@ -127,17 +148,14 @@ function findAccountNoUname() {
 
 function findTask(id) { 
   //queries databse for task
-  console.log("Querying for task '" + id + "'");
   return Task.findOne(qObj(id))
   .exec()
   .then((taskResult) => {
     //if a task is returned, send  task to application
     if (taskResult != null) {
-      console.log("Task found: " + taskResult);
       return jsonToString(taskResult);
     } else {
       //otherwise, send a 0 to show that nothing was returned
-      console.log("No task found");
       return "0";
     }
   })

@@ -29,7 +29,7 @@ void TaskModal::setStartDate(project::Date input) {
 }
 void TaskModal::setEndDate(project::Date input) {
     QDate d = QDate(input.getDate(), input.getMonth(), input.getYear());
-    ui->startDate->setDate(d);
+    ui->endDate->setDate(d);
 }
 void TaskModal::addUser(project::UserAccess* input) {
     return;

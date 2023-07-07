@@ -55,8 +55,3 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 INCLUDEPATH += $$PWD/.
 DEPENDPATH += $$PWD/.
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/3rdparty/cryptopp-master/x64/Output/release/ -lcryptlib
-
-INCLUDEPATH += $$PWD/3rdparty/cryptopp-master/x64/Output/Release
-DEPENDPATH += $$PWD/3rdparty/cryptopp-master/x64/Output/Release
-INCLUDEPATH += $$PWD/3rdparty/cryptopp-master

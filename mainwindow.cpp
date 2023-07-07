@@ -131,7 +131,7 @@ void MainWindow::TaskReply(QNetworkReply *reply) {
     qDebug() << answer;
 
     std::string id, name, description, state;
-    project::Date *start, *end;
+    project::Date *start = new project::Date(0,0,0), *end = new project::Date(0,0,0);
     QStringList record = answer.split("|");
 
     for (QString r : record) {
@@ -151,6 +151,7 @@ void MainWindow::TaskReply(QNetworkReply *reply) {
         } else if (field == "endDate") {
             QStringList nums = value.split(',');
             end = new project::Date(nums[0].toInt(),nums[1].toInt(),nums[2].toInt());
+            qDebug() << QString::fromStdString(end->getDateString());
         } else if (field == "state") {
             state = value.toStdString();
         }

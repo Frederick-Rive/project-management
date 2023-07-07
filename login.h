@@ -6,6 +6,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QHttpMultiPart>
+//#include <encryption.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class login; }
@@ -18,11 +19,16 @@ class login : public QMainWindow
 public:
     login(QWidget *parent = nullptr);
     ~login();
-    void ReplyFinished(QNetworkReply *reply);
-    void logIn();
+
+    void LoginFinished(QNetworkReply *reply);
+    void LogIn();
+
+    void RegisterFinished(QNetworkReply *reply);
 
 private slots:
     void on_loginButton_clicked();
+    void on_registerButton_clicked();
+
 private:
     Ui::login *ui;
 

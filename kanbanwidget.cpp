@@ -19,18 +19,12 @@ KanbanWidget::~KanbanWidget()
 {
     delete ui;
 }
-/*
+
 void KanbanWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        if ((event->globalPosition() - frameGeometry().topLeft()).toPoint() == startPos) {
-            qDebug() << event->globalPosition();
-            mainWindow->OpenTaskModal(task);
-        } else {
-            qDebug() << ((event->globalPosition().toPoint() - startPos).x() < -200 ? "To Do" : (event->globalPosition().toPoint() - startPos).x() > 200 ? "Completed" : "In Progress");
-        }
-        return;
+        mainWindow->OpenTaskModal(task);
     }
     return;
-}*/
+}

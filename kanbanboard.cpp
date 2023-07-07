@@ -36,7 +36,7 @@ void KanbanBoard::AddTask(int state, project::Task* task) {
         ui->completedLayout->insertWidget(ui->todoLayout->children().size(), newWidget);
         break;
     }
-    newWidget->installEventFilter(this);
+    //newWidget->installEventFilter(this);
 }
 void KanbanBoard::RemoveTask(int state, int index) {
 
