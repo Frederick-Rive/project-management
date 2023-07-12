@@ -1,5 +1,6 @@
 #include "kanbanboard.h"
 #include "ui_kanbanboard.h"
+#include "taskmodal.h"
 
 KanbanBoard::KanbanBoard(MainWindow *m, QWidget *parent) :
     QWidget(parent),
@@ -38,6 +39,7 @@ void KanbanBoard::AddTask(int state, project::Task* task) {
     }
     //newWidget->installEventFilter(this);
 }
+
 void KanbanBoard::RemoveTask(int state, int index) {
 
 }
@@ -73,5 +75,11 @@ bool KanbanBoard::eventFilter(QObject *obj, QEvent *event)
         }
     }
     return false;
+}
+
+
+void KanbanBoard::on_addNewButton_clicked()
+{
+    mainWindow->OpenTaskModal(nullptr);
 }
 

@@ -39,7 +39,8 @@ bool Date::setYear(int input) { this->year = input; return true; }
 int Date::getWeekDay() { return 0; }
 int Date::getWeek() { return 0; }
 
-Account::Account(std::string uName, std::string pHash, std::string email) {
+Account::Account(std::string i, std::string uName, std::string pHash, std::string email) {
+    this->id = i;
     this->username = uName;
     this->password = pHash;
     this->userEmail = email;
@@ -56,7 +57,7 @@ std::string Account::getUserEmail() { return this->userEmail; }
 int Account::getProjectCount() { return this->projects.size(); }
 Project Account::getProject(int index) { return this->projects[index]; }
 
-UserAccess::UserAccess(std::string uName, std::string pHash, std::string email, std::string accessLevel) : Account(uName, pHash, email) {
+UserAccess::UserAccess(std::string i, std::string uName, std::string pHash, std::string email, std::string accessLevel) : Account(i, uName, pHash, email) {
     this->level = accessLevel;
 }
 UserAccess::UserAccess(Account *account, std::string accessLevel) : Account(*account) {
@@ -79,12 +80,12 @@ std::string Log::getActivity() { return this->activity; }
 Date Log::getDate() { return this->date; }
 
 
-Task::Task(std::string i, std::string n, std::string d, Date *start, Date *end) {
+Task::Task(std::string i, std::string n, std::string d, Date start, Date end) {
     this->id = i;
     this->name = n;
     this->description = d;
-    this->startDate = *start;
-    this->endDate = *end;
+    this->startDate = start;
+    this->endDate = end;
 }
 std::string Task::getName() { return this->name; }
 bool Task::setName(std::string input) { this->name = input; return true; }
@@ -95,6 +96,7 @@ Date Task::getEndDate() { return this->endDate; }
 bool Task::setStartDate(Date input) { this->startDate = input; return true; }
 bool Task::setEndDate(Date input) { this->endDate = input; return true; }
 int Task::getUserCount() { return this->users.size(); }
+std::string Task::getUser(int input) { return this->users[input]; }
 bool Task::addUser(std::string input) { this->users.push_back(input); return true; }
 bool Task::removeUser(int input) {
     return true;

@@ -33,6 +33,7 @@ private:
 
 private slots:
     void GetNewTask(int state);
+    void on_addNewButton_clicked();
 };
 
 #endif // KANBANBOARD_H

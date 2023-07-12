@@ -38,7 +38,7 @@ namespace project {
         std::vector<Project> projects;
 
     public:
-        Account(std::string uName, std::string pHash, std::string email);
+        Account(std::string i, std::string uName, std::string pHash, std::string email);
         std::string getID();
         std::string getUsername();
         bool checkUsername(std::string check);
@@ -58,7 +58,7 @@ namespace project {
         bool passwordResetRequested;
 
     public:
-        UserAccess(std::string uName, std::string pHash, std::string email, std::string accessLevel);
+        UserAccess(std::string i, std::string uName, std::string pHash, std::string email, std::string accessLevel);
         UserAccess(Account *account, std::string accessLevel);
         std::string getAccessID();
         std::string getAccessLevel();
@@ -86,7 +86,7 @@ namespace project {
         std::vector<std::string> users;
 
     public:
-        Task(std::string i, std::string n, std::string d, Date* start, Date* end);
+        Task(std::string i, std::string n, std::string d, Date start, Date end);
         std::string getName();
         bool setName(std::string input);
         std::string getDescription();
@@ -96,6 +96,7 @@ namespace project {
         bool setStartDate(Date input);
         bool setEndDate(Date input);
         int getUserCount();
+        std::string getUser(int input);
         bool addUser(std::string input);
         bool removeUser(int input);
         std::string getState();

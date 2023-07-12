@@ -6,7 +6,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QHttpMultiPart>
-//#include <encryption.h>
+#include <simplecrypt.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class login; }
@@ -34,5 +34,7 @@ private:
 
     QNetworkAccessManager *manager;
     QNetworkRequest request;
+
+    SimpleCrypt *crypt;
 };
 #endif // LOGIN_H

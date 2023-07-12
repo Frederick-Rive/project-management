@@ -20,24 +20,29 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setStyleSheet(
                 "* { background-color: #fff }"
+                "QLabel { background-color: #E7ECEF; padding: 5px; font-size: 18px; text-align: centre; }"
                 "QWidget#leftWidget { background-color: #E7ECEF; }"
                 "QWidget#headerWidget { background-color: #E7ECEF; }"
                 "QPushButton { background-color: #6096BA; border: none; color: #fff }"
                 "QPushButton:hover { background-color: #5096aA; border: none; color: #fff }"
                 );
 
-    QWidget *pfpWidget = new QWidget(this);
+    QLabel *pfpWidget = new QLabel(this);
+    QPixmap pfp = QPixmap(":/images/images/user_icon.png", "PNG");
+    //pfp.scaled(100, 100);
+    pfpWidget->setPixmap(QPixmap(":/images/images/user_icon.png", "PNG"));
+    pfpWidget->setStyleSheet("margin: 0px auto;");
     ui->leftLayout->addWidget(pfpWidget);
 
     usernameLabel = new QLabel(this);
     ui->leftLayout->addWidget(usernameLabel);
 
     QLabel *projectTitle = new QLabel(this);
-    projectTitle->setText("Project");
+    projectTitle->setText("<Project Name>");
     ui->leftLayout->addWidget(projectTitle);
-    projectName = new QLabel(this);
-    projectName->setText(QString::fromStdString(tempProject->getName()));
-    ui->leftLayout->addWidget(projectName);
+    //projectName = new QLabel(this);
+    //projectName->setText(QString::fromStdString(tempProject->getName()));
+    //ui->leftLayout->addWidget(projectName);
 
     Notification *overdueNotif = new Notification("Overdue", this);
     ui->leftLayout->addWidget(overdueNotif);
@@ -49,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *logOut = new QPushButton(this);
     logOut->setText("Log Out");
     ui->leftLayout->addWidget(logOut);
-    connect(logOut, SIGNAL(QPushButton::clicked), this, SLOT(MainWindow::Logout));
+    connect(logOut, &QPushButton::clicked, this, &MainWindow::Logout);
 
     //mainwindow
 
@@ -73,12 +78,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->headerWidget->installEventFilter(this);
     ui->leftWidget->installEventFilter(this);
 
-    project::Task* uploadTest = new project::Task("688434", "Upload", "I want To Upload", new project::Date(1, 7, 2023), new project::Date(3, 7, 2023));
-    manager = new QNetworkAccessManager;
-    auto status = connect(manager, &QNetworkAccessManager::finished,
-                      this, &MainWindow::UserReply);
+    crypt = new SimpleCrypt(Q_UINT64_C(0x0c2ad4a4acb9f023));
 
-    //manager->post(QNetworkRequest(QUrl("http://localhost:6069/user")));
+    GetUserTasks();
 }
 
 MainWindow::~MainWindow()
@@ -101,22 +103,52 @@ void MainWindow::UserReply(QNetworkReply *reply) {
     std::vector<std::string> projects;
     QStringList record = answer.split("|");
     for (QString r : record) {
-        qDebug() << r;
+
         QString field = r.split(":")[0].replace("\"", "");
         QString value = r.split(":")[1].replace("\"", "");
-        qDebug() << field << ": " << value;
+
         if (field == "username") {
-            username = value.toStdString();
+            username = crypt->decryptToString(value).toStdString();
         } else if (field == "password") {
             password = value.toStdString();
         } else if (field == "_id") {
             id = value.toStdString();
         }
     }
-    user = new project::Account(username, password, id);
+    user = new project::Account(id, username, password, "none");
     usernameLabel->setText(QString::fromStdString(user->getUsername()));
 
-    GetTask("6496eaea0cb82235725b3c38");
+    //GetTask("6496eaea0cb82235725b3c38");
+}
+
+void MainWindow::GetUserTasks() {
+    for(project::Task* task : todo) {
+        delete task;
+    }
+    for(project::Task* task : inprogress) {
+        delete task;
+    }
+    for(project::Task* task : completed) {
+        delete task;
+    }
+
+    todo.clear();
+    inprogress.clear();
+    completed.clear();
+
+    manager = new QNetworkAccessManager;
+    auto status = connect(manager, &QNetworkAccessManager::finished,
+                      this, &MainWindow::UserTaskReply);
+
+    manager->get(QNetworkRequest(QUrl("http://localhost:6069/usertasks")));
+}
+
+void MainWindow::UserTaskReply(QNetworkReply *reply) {
+    QString answer = reply->readAll();
+    QStringList ids = answer.split('|');
+    for(QString id : ids) {
+        GetTask(id);
+    }
 }
 
 void MainWindow::GetTask(QString id) {
@@ -131,29 +163,26 @@ void MainWindow::TaskReply(QNetworkReply *reply) {
     qDebug() << answer;
 
     std::string id, name, description, state;
-    project::Date *start = new project::Date(0,0,0), *end = new project::Date(0,0,0);
+    project::Date start = project::Date(0,0,0), end = project::Date(0,0,0);
     QStringList record = answer.split("|");
 
     for (QString r : record) {
-        qDebug() << r;
         QString field = r.split(":")[0].replace("\"", "");
         QString value = r.split(":")[1].replace("\"", "");
-        qDebug() << field << ": " << value;
         if (field == "_id") {
             id = value.toStdString();
         } else if (field == "name") {
-            name = value.toStdString();
+            name = crypt->decryptToString(value).toStdString();
         } else if (field == "description") {
-            description = value.toStdString();
+            description = crypt->decryptToString(value).toStdString();
         } else if (field == "startDate") {
             QStringList nums = value.split(',');
-            start = new project::Date(nums[0].toInt(),nums[1].toInt(),nums[2].toInt());
+            start = project::Date(nums[0].toInt(),nums[1].toInt(),nums[2].toInt());
         } else if (field == "endDate") {
             QStringList nums = value.split(',');
-            end = new project::Date(nums[0].toInt(),nums[1].toInt(),nums[2].toInt());
-            qDebug() << QString::fromStdString(end->getDateString());
+            end = project::Date(nums[0].toInt(),nums[1].toInt(),nums[2].toInt());
         } else if (field == "state") {
-            state = value.toStdString();
+            state = crypt->decryptToString(value).toStdString();
         }
     }
 
@@ -241,8 +270,54 @@ void MainWindow::ClearMainWidget() {
 
 void MainWindow::OpenTaskModal(project::Task *task) {
     modal = new TaskModal(task, this);
-    modal->move(this->geometry().center() - modal->geometry().center());
+    modal->move(mainWidget->mapToGlobal(mainWidget->geometry().topLeft()) - frameGeometry().topLeft());
     modal->show();
+}
+
+void MainWindow::SaveTask(project::Task *task) {
+    task->addUser(user->getID());
+
+    manager = new QNetworkAccessManager();
+    QString start, end, users = "[";
+    QTextStream(&start) << "["<<task->getStartDate().getDate()<<","<<task->getStartDate().getMonth()<<","<<task->getStartDate().getYear()<<"]";
+    QTextStream(&end) << "["<<task->getEndDate().getDate()<<","<<task->getEndDate().getMonth()<<","<<task->getEndDate().getYear()<<"]";
+
+    for (int i = 0; i < task->getUserCount(); i++) {
+        users += "\"" + QString::fromStdString(task->getUser(i)) + (i != task->getUserCount() - 1 ? "\",": "\"");
+    }
+    users += "]";
+
+    QByteArray data = QByteArray(("{ \"n\":\""+crypt->encryptToString(QString::fromStdString(task->getName()))+"\",\"d\":\""+crypt->encryptToString(QString::fromStdString(task->getDescription()))+"\",\"s\":\""+crypt->encryptToString(QString::fromStdString(task->getState()))+"\","
+                                    "\"sd\":"+start+",\"ed\":"+end+",\"u\": "+users+" }").toUtf8());
+
+    QNetworkRequest request = QNetworkRequest(QUrl("http://localhost:6069/task"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/plain");
+
+    auto status = connect(manager, &QNetworkAccessManager::finished,
+                      this, &MainWindow::TaskSaved);
+    manager->post(request, data);
+    qDebug() << "Connection status:" << status;
+}
+
+void MainWindow::TaskSaved(QNetworkReply *reply) {
+    auto read = reply->read(1);
+    std::string result = std::string(read.constData(), 1);
+    if (result == "1") {
+        if (activeButton != ui->kanbanButton) {
+            activeButton->setStyleSheet("background-color: #6096BA;");
+        }
+
+        ClearMainWidget();
+
+        activeButton = ui->kanbanButton;
+        activeButton->setStyleSheet("background-color: #274C77;");
+        mainWidget = new KanbanBoard(this, this);
+
+        ui->mainLayout->addWidget(mainWidget);
+
+        GetUserTasks();
+    }
+    reply->manager()->deleteLater();
 }
 
 void MainWindow::Logout() {

@@ -3,12 +3,16 @@
 #include <QWidget>
 #include <QPushButton>
 #include <mainwindow.h>
+#include <QProcess>
+#include <QCryptographicHash>
 
 login::login(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::login)
 {
     ui->setupUi(this);
+
+    crypt = new SimpleCrypt(Q_UINT64_C(0x0c2ad4a4acb9f023));
 }
 
 login::~login()
@@ -26,23 +30,23 @@ void login::LoginFinished(QNetworkReply *reply) {
 }
 
 void login::on_loginButton_clicked()
-{
-//    QString username = ui->usernameEdit->text();
-
-//    std::string cipher = crypt::encrypt(username.toStdString());
-//    qDebug() << QString::fromStdString(cipher);
-//    qDebug() << QString::fromStdString(crypt::decrypt(cipher));
-
+{    
     manager = new QNetworkAccessManager();
     if(ui->usernameEdit->text() != "" && ui->passwordEdit->text() != "") {
         QString username = ui->usernameEdit->text();
         QString password = ui->passwordEdit->text();
 
+        QString uCipher = crypt->encryptToString(username);
+
+        QCryptographicHash hashAlgo = QCryptographicHash(QCryptographicHash::Md5);
+
+        QString pHash = hashAlgo.hash(password.toUtf8(), QCryptographicHash::Md5).toHex();
+
         auto status = connect(manager, &QNetworkAccessManager::finished,
                           this, &login::LoginFinished);
         qDebug() << "Connection status:" << status;
 
-        manager->get(QNetworkRequest(QUrl("http://localhost:6069/account?u=" + username + "&h=" + password)));
+        manager->get(QNetworkRequest(QUrl("http://localhost:6069/account?u=" + uCipher + "&h=" + pHash)));
     }
 }
 
@@ -60,10 +64,14 @@ void login::on_registerButton_clicked()
     if(ui->usernameEdit->text() != "" && ui->passwordEdit->text() != "") {
         QString username = ui->usernameEdit->text();
         QString password = ui->passwordEdit->text();
-        QByteArray data = QByteArray(("{ \"n\":\""+username+"\",\"h\":\""+password+"\" }").toUtf8());
-        //QByteArray *data = new QByteArray("username="+username+"&password="+password+"&if_login=Y&B2=%B5%C7%C2%BC%28Login%29");
 
-        qDebug() << data;
+        QString uCipher = crypt->encryptToString(username);
+
+        QCryptographicHash hashAlgo = QCryptographicHash(QCryptographicHash::Md5);
+
+        QString pHash = hashAlgo.hash(password.toUtf8(), QCryptographicHash::Md5).toHex();
+
+        QByteArray data = QByteArray(("{ \"n\":\""+uCipher+"\",\"h\":\""+pHash+"\" }").toUtf8());
 
         QNetworkRequest request = QNetworkRequest(QUrl("http://localhost:6069/account"));
         request.setHeader(QNetworkRequest::ContentTypeHeader, "text/plain");
@@ -73,8 +81,6 @@ void login::on_registerButton_clicked()
 
         manager->post(request, data);
         qDebug() << "Connection status:" << status;
-        //reply->readyRead();
-        //manager->post(QNetworkRequest(QUrl("http://localhost:6069/account?u=" + username + "&h=" + password)));
     }
 }
 

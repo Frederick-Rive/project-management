@@ -125,7 +125,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="addNewButton">
           <property name="minimumSize">
            <size>
             <width>48</width>

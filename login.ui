@@ -150,7 +150,7 @@
          </size>
         </property>
         <property name="text">
-         <string>t</string>
+         <string>Test</string>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Password</enum>

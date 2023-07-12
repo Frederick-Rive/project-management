@@ -20,8 +20,12 @@ public:
     void setDescription(std::string input);
     void setStartDate(project::Date input);
     void setEndDate(project::Date input);
+    void setState(std::string input);
     void addUser(project::UserAccess* input);
     void removeUser(int input);
+
+private slots:
+    void on_saveButton_clicked();
 
 private:
     project::Task *task;

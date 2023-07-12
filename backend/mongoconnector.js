@@ -39,8 +39,10 @@ var user = new Account();
 
 //gets an account based on its ID
 app.get('/account', async (req, res) => {
+  console.log(req.query);
   if (req.query.u && req.query.u != "{}") {
     var account = await findAccount(req.query.u, req.query.h);
+    console.log(account);
     if (account) {
       console.log('logged in');
       user = account;
@@ -70,29 +72,49 @@ app.get('/task', async (req, res) => {
   }
 });
 
+app.get('/usertasks', async (req, res) => {
+  var tasks = await findUserTasks();
+  let rtrn = "";
+  for (task of tasks) {
+    rtrn += task.id + "|";
+  }
+  rtrn = rtrn.slice(0, -1);
+  res.send(rtrn);
+});
+
+app.post('/task', async (req, res) => {
+  let body = JSON.parse(req.body);
+  var newTask = new Task({
+    _id: new mongoose.Types.ObjectId,
+    name: body.n,
+    description: body.d,
+    state: body.s,
+    startDate: body.sd,
+    endDate: body.ed,
+    users: body.u
+  })
+  newTask.save();
+  res.send('1');
+})
+
 app.post('/account', async (req, res) => {
   let body = JSON.parse(req.body);
-  Account.findOne({ username: body.n })
-  .exec()
-  .then((accountResult) => {
-    if (accountResult) {
-      console.log("Name Taken");
-      res.send("Name Taken");
-    } else {
+  console.log(body);
+  var accTest = await checkAccount(req.query.u);
+  if (accTest) {
+    console.log("Name Taken");
+    res.send('0');
+  } else {
       var newAccount = new Account({
         _id: new mongoose.Types.ObjectId,
         username: body.n,
         password: body.h,
         email: null,
-        projects: [mongoose.Types.ObjectId("6490b3a858f110c790acb03e")]
       });
+      console.log(newAccount);
       newAccount.save();
+      res.send('1');
     }
-  })  
-  .catch((err) => {
-    //if connection failed, return error message
-    return ("Error: " + err);
-  })
 });
 
 app.get('/project', async (req, res) => {
@@ -113,22 +135,36 @@ app.get('/project', async (req, res) => {
 
 //gets an account based on its ID
 app.get('/user', async (req, res) => {
-  res.send(jsonToString(user));
+  console.log(typeof user);
+  if (user && user != '0') {
+    res.send(jsonToString(user));
+  } else {
+    res.send(user);
+  }
 });
 
 app.listen(6069, () => {
   console.log("listening on port 6069");
 });
 
-function findAccount(uName, pHash) { 
+function findAccount(uName, pHash) {
+  return Account.findOne({ username: uName, password: pHash })
+  .exec()
+  .then((accountResult) => {
+    console.log(accountResult);
+    console.log("aaa");
+    return (accountResult);
+  })
+  .catch((err) => {
+    return ("Error: " + err);
+  })
+}
+
+function checkAccount(uName) {
   return Account.findOne({ username: uName })
   .exec()
   .then((accountResult) => {
-    console.log(pHash)
-    if(accountResult.password == pHash){
-      return (accountResult);
-    } 
-    return 0;
+    return (accountResult);
   })
   .catch((err) => {
     return ("Error: " + err);
@@ -161,6 +197,17 @@ function findTask(id) {
   })
   .catch((err) => {
     //if connection failed, return error message
+    return ("Error: " + err);
+  })
+}
+
+function findUserTasks() {
+  return Task.find({"users": user._id})
+  .exec()
+  .then((taskResult) => {
+    return taskResult;
+  })
+  .catch((err) => {
     return ("Error: " + err);
   })
 }
