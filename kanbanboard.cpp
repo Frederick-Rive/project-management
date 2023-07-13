@@ -16,6 +16,7 @@ KanbanBoard::KanbanBoard(MainWindow *m, QWidget *parent) :
     ui->inprogressLayout->addStretch();
     ui->completedLayout->addStretch();
 
+    //Automatically call GetNewTask function whenever a new task is added in the MainWindow
     connect(mainWindow , &MainWindow::taskAdded, this, &KanbanBoard::GetNewTask);
 }
 
@@ -24,6 +25,7 @@ KanbanBoard::~KanbanBoard()
     delete ui;
 }
 
+// Create a new KanbanWidget based on a Task, and add it to the Kanban Board
 void KanbanBoard::AddTask(int state, project::Task* task) {
     KanbanWidget *newWidget = new KanbanWidget(task, mainWindow, this);
     switch(state){
@@ -47,11 +49,12 @@ void KanbanBoard::ClearTasks() {
 
 }
 
+//Get latest task from the MainWindow
 void KanbanBoard::GetNewTask(int state) {
-    qDebug() << 'c';
     AddTask(state, mainWindow->GetLatestTask(state));
 }
 
+// Handles dragging Kanban Widgets (inactive)
 bool KanbanBoard::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress)

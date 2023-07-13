@@ -8,7 +8,6 @@ Notification::Notification(QString title, QWidget *parent) :
     ui->setupUi(this);
 
     ui->title->setText(title);
-
     this->setStyleSheet("background-color: #E7ECEF;");
 }
 
