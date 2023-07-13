@@ -13,6 +13,7 @@ TaskModal::TaskModal(project::Task *t, QWidget *parent) :
     ui->stateCombo->addItem("Completed");
 
     if (t != nullptr) {
+        // If a task has been opened
         task = t;
 
         this->setTitle(task->getName());
@@ -21,6 +22,7 @@ TaskModal::TaskModal(project::Task *t, QWidget *parent) :
         this->setEndDate(task->getEndDate());
         this->setState(task->getState());
     } else {
+        // If a new task is being created
         task = nullptr;
     }
 
@@ -70,16 +72,18 @@ TaskModal::~TaskModal()
     delete ui;
 }
 
+// Save changes user made to a task, and upload them to the database
 void TaskModal::on_saveButton_clicked()
 {
-    qDebug() << "?";
     if(task == nullptr) {
+        // Create a new task, if one did not already exist
         QDate start = ui->startDate->date();
         QDate end = ui->endDate->date();
-        //Task(std::string i, std::string n, std::string d, Date* start, Date* end);
+
         task = new project::Task("new", ui->title->text().toStdString(), ui->description->toPlainText().toStdString(), project::Date(start.year(),start.month(),start.day()), project::Date(end.year(),end.month(),end.day()));
         task->setState(ui->stateCombo->currentText().toStdString());
     } else {
+        // Modify existing task
         task->setName(ui->title->text().toStdString());
         QDate start = ui->startDate->date();
         task->setStartDate(project::Date(start.year(),start.month(),start.day()));
@@ -89,6 +93,7 @@ void TaskModal::on_saveButton_clicked()
         task->setDescription(ui->description->toPlainText().toStdString());
     }
 
+    // Upload task to database
     qobject_cast<MainWindow*>(this->parent())->SaveTask(task);
 }
 

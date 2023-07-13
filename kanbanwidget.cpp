@@ -8,6 +8,7 @@ KanbanWidget::KanbanWidget(project::Task *t, MainWindow *m, QWidget *parent) :
     ui->setupUi(this);
 
     task = t;
+
     mainWindow = m;
 
     ui->title->setText(QString::fromStdString(task->getName()));
